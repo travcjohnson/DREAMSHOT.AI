@@ -1,0 +1,325 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  password      String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts      Account[]
+  sessions      Session[]
+  projects      Project[]
+  conversations Conversation[]
+  generations   Generation[]
+  dreams        Dream[]
+  aiTests       AiTest[]
+  progressLogs  ProgressLog[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+// Core DREAMSHOT.AI Models
+
+model Dream {
+  id               String        @id @default(cuid())
+  userId           String        @map("user_id")
+  title            String
+  description      String        @db.Text
+  originalPrompt   String        @db.Text @map("original_prompt")
+  category         DreamCategory @default(OTHER)
+  tags             String[]      @default([])
+  isPublic         Boolean       @default(false) @map("is_public")
+  status           DreamStatus   @default(ACTIVE)
+  metadata         Json?         @default("{}")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aiTests      AiTest[]
+  progressLogs ProgressLog[]
+
+  // Indexes for fast queries
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([category, createdAt(sort: Desc)])
+  @@index([isPublic, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("dreams")
+}
+
+model AiTest {
+  id                    String           @id @default(cuid())
+  dreamId               String           @map("dream_id")
+  userId                String           @map("user_id")
+  provider              AiProvider
+  model                 String
+  testPrompt            String           @db.Text @map("test_prompt")
+  response              String?          @db.Text
+  impossibilityScore    Decimal          @db.Decimal(5, 2) @map("impossibility_score") // 0.00 to 100.00
+  confidence            Decimal          @db.Decimal(5, 2) // 0.00 to 100.00
+  reasoning             String?          @db.Text
+  status                TestStatus       @default(PENDING)
+  tokensUsed            Int?             @map("tokens_used")
+  cost                  Decimal?         @db.Decimal(10, 6)
+  duration              Int?             // milliseconds
+  errorMessage          String?          @map("error_message")
+  testParameters        Json?            @map("test_parameters") // temperature, max_tokens, etc.
+  metadata              Json?            @default("{}")
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @updatedAt @map("updated_at")
+
+  dream Dream @relation(fields: [dreamId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Indexes for analytics and progress tracking
+  @@index([dreamId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([provider, model])
+  @@index([impossibilityScore])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("ai_tests")
+}
+
+model ProgressLog {
+  id                     String    @id @default(cuid())
+  dreamId                String    @map("dream_id")
+  userId                 String    @map("user_id")
+  averageImpossibility   Decimal   @db.Decimal(5, 2) @map("average_impossibility")
+  bestScore              Decimal   @db.Decimal(5, 2) @map("best_score")
+  testCount              Int       @map("test_count")
+  activeModels           String[]  @map("active_models")
+  improvementTrend       Decimal?  @db.Decimal(5, 2) @map("improvement_trend") // % change
+  milestoneReached       String?   @map("milestone_reached")
+  notes                  String?
+  snapshotData           Json      @map("snapshot_data") // Full data snapshot for analytics
+  createdAt              DateTime  @default(now()) @map("created_at")
+
+  dream Dream @relation(fields: [dreamId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Optimized for time-series analysis
+  @@index([dreamId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([averageImpossibility])
+  @@index([createdAt(sort: Desc)])
+  @@map("progress_logs")
+}
+
+model AiModel {
+  id                String     @id @default(cuid())
+  provider          AiProvider
+  name              String
+  displayName       String     @map("display_name")
+  description       String?
+  maxTokens         Int        @map("max_tokens")
+  costPer1kTokens   Decimal    @db.Decimal(10, 6) @map("cost_per_1k_tokens")
+  isActive          Boolean    @default(true) @map("is_active")
+  capabilities      String[]   @default([])
+  metadata          Json?      @default("{}")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+
+  @@unique([provider, name])
+  @@index([isActive])
+  @@map("ai_models")
+}
+
+// Legacy models for backward compatibility
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  userId      String        @map("user_id")
+  status      ProjectStatus @default(ACTIVE)
+  settings    Json?         @default("{}")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversations Conversation[]
+  generations   Generation[]
+
+  @@map("projects")
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  title     String?
+  userId    String   @map("user_id")
+  projectId String?  @map("project_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project  Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  messages Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String   @map("conversation_id")
+  role           String   // 'user', 'assistant', 'system'
+  content        String   @db.Text
+  metadata       Json?    @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Generation {
+  id         String           @id @default(cuid())
+  userId     String           @map("user_id")
+  projectId  String?          @map("project_id")
+  type       GenerationType
+  provider   String           // 'openai', 'anthropic', etc.
+  model      String
+  prompt     String           @db.Text
+  response   String?          @db.Text
+  status     GenerationStatus @default(PENDING)
+  tokensUsed Int?             @map("tokens_used")
+  cost       Decimal?         @db.Decimal(10, 6)
+  metadata   Json?            @default("{}")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@map("generations")
+}
+
+model ApiUsage {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  provider   String
+  model      String
+  endpoint   String
+  tokensUsed Int      @map("tokens_used")
+  cost       Decimal  @db.Decimal(10, 6)
+  date       DateTime @default(now())
+
+  @@map("api_usage")
+}
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+enum GenerationType {
+  TEXT
+  IMAGE
+  CODE
+  ANALYSIS
+}
+
+enum GenerationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// DREAMSHOT.AI specific enums
+enum DreamCategory {
+  TECHNOLOGY
+  BUSINESS
+  CREATIVE
+  SCIENCE
+  PERSONAL
+  SOCIAL
+  ENVIRONMENTAL
+  EDUCATION
+  HEALTHCARE
+  OTHER
+}
+
+enum DreamStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+  COMPLETED
+}
+
+enum AiProvider {
+  OPENAI
+  ANTHROPIC
+  GOOGLE
+  AZURE
+  COHERE
+  HUGGINGFACE
+  LOCAL
+}
+
+enum TestStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}

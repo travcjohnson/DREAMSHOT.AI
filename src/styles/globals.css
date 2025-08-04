@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Ultra-minimal color palette inspired by Supabase */
+    --background: 0 0% 100%;
+    --foreground: 240 6% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 6% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 10%;
+
+    /* Primary: Modern emerald green */
+    --primary: 158 64% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Ultra-light gray */
+    --secondary: 240 3% 97%;
+    --secondary-foreground: 240 6% 10%;
+
+    /* Muted: Softer grays */
+    --muted: 240 3% 97%;
+    --muted-foreground: 240 5% 65%;
+
+    /* Accent: Subtle neutral */
+    --accent: 240 3% 97%;
+    --accent-foreground: 240 6% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Minimal borders */
+    --border: 240 6% 94%;
+    --input: 240 6% 94%;
+    --ring: 158 64% 52%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 8% 5%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 8% 5%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 158 64% 52%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4% 8%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 4% 8%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 240 4% 8%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 4% 12%;
+    --input: 240 4% 12%;
+    --ring: 158 64% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image: 
+      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: 0 0, 0 0;
+    background-attachment: fixed;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .animate-in {
+    @apply animate-slide-up;
+  }
+  
+  .grid-bg {
+    background-image: 
+      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  
+  .glass-effect {
+    @apply bg-background/80 backdrop-blur-md border border-border/50;
+  }
+}
