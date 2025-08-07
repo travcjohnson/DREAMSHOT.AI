@@ -1,154 +1,259 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { HeroSection } from '@/components/features/hero-section';
+import { PromptInput } from '@/components/features/prompt-input';
+import { ResultsDisplay } from '@/components/features/results-display';
+import { EmailCapture } from '@/components/features/email-capture';
+import { getTrendingPrompts, recentActivity } from '@/lib/data/example-prompts';
 
 export default function HomePage() {
+  const [currentPrompt, setCurrentPrompt] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [showEmailCapture, setShowEmailCapture] = useState(false);
+
+  const handlePromptSubmit = (prompt: string) => {
+    setCurrentPrompt(prompt);
+    setIsProcessing(true);
+    
+    // Simulate processing time
+    setTimeout(() => {
+      setIsProcessing(false);
+      setShowResults(true);
+      // Smooth scroll to results
+      setTimeout(() => {
+        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }, 4500);
+  };
+
+  const handleEmailCapture = () => {
+    setShowEmailCapture(true);
+  };
+
+  const handleEmailSuccess = () => {
+    setShowEmailCapture(false);
+    // Could show a success message or redirect
+  };
+
+  const trendingPrompts = getTrendingPrompts();
+
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="sticky top-0 z-50 glass-effect">
+    <div className="min-h-screen bg-[hsl(var(--paper))]">
+      {/* Minimal Header */}
+      <header className="fixed top-0 w-full z-40 bg-[hsl(var(--paper))]/95 border-b-4 border-black">
         <div className="container mx-auto px-6 py-4">
           <nav className="flex items-center justify-between">
-            <div className="text-xl font-semibold tracking-tight text-foreground">
-              DREAMSHOT.AI
+            <div className="font-display text-2xl font-black">
+              MyPromptBench
             </div>
-            <div className="flex items-center gap-2">
-              <Link href="/auth/login">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                  Login
-                </Button>
-              </Link>
-              <Link href="/auth/register">
-                <Button size="sm" className="bg-primary hover:bg-primary/90">Get Started</Button>
-              </Link>
+            <div className="font-mono text-sm">
+              <span className="hidden md:inline">A Scientific Study of AI Progress</span>
             </div>
           </nav>
         </div>
       </header>
 
       {/* Hero Section */}
-      <main className="container mx-auto px-6">
-        <div className="text-center py-32">
-          <h1 className="text-5xl md:text-6xl font-medium text-foreground mb-8 leading-[1.1] tracking-tight">
-            Track Your Dreams from
-            <br />
-            <span className="text-primary">Impossible to Inevitable</span>
-          </h1>
-          <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Share your wildest dreams and watch AI analyze their journey from impossible to possible. 
-            Every breakthrough started as someone's "impossible" idea.
-          </p>
-          <div className="flex gap-3 justify-center flex-wrap">
-            <Link href="/dreams/new">
-              <Button size="lg" className="h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground">
-                Submit Your Dream
-              </Button>
-            </Link>
-            <Link href="/about">
-              <Button variant="outline" size="lg" className="h-12 px-8 border-border hover:bg-muted">
-                How It Works
-              </Button>
-            </Link>
-          </div>
-        </div>
+      <main className="pt-20">
+        <HeroSection />
 
-        {/* Features Grid */}
-        <div className="py-32">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-6 tracking-tight">
-              AI-Powered Dream Analysis
+        {/* Problem Section */}
+        <section className="py-20 md:py-32 bg-white border-t-4 border-black">
+          <div className="container mx-auto px-6 max-w-5xl">
+            <div className="text-center mb-16">
+              <h2 className="font-display text-display mb-8">
+                But here&apos;s what
+                <br />
+                <span className="highlight">usually happens...</span>
+              </h2>
+            </div>
+
+            <div className="max-w-3xl mx-auto">
+              <div className="space-y-8">
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl">😎</div>
+                  <div>
+                    <p className="text-xl font-bold mb-2">&ldquo;Oh cool, GPT-5 is out!&rdquo;</p>
+                    <p className="text-gray-600">You rush to try the new model...</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl">🤔</div>
+                  <div>
+                    <p className="text-xl font-bold mb-2">&ldquo;What was that prompt I used to test GPT-4?&rdquo;</p>
+                    <p className="text-gray-600">You search through old chats, notes, everywhere...</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl">😩</div>
+                  <div>
+                    <p className="text-xl font-bold mb-2">&ldquo;...I have no idea.&rdquo;</p>
+                    <p className="text-gray-600 text-lg">
+                      You lose the magic of seeing AI evolve because you can&apos;t remember your exact words.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-16 p-8 bg-black text-white">
+                <p className="font-mono text-lg text-center">
+                  FACT: 97% of prompts are lost to history*
+                </p>
+                <p className="font-mono text-xs text-center mt-2 opacity-70">
+                  *We made this up but you know it&apos;s true
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Solution Section */}
+        <section className="py-20 md:py-32 bg-[hsl(var(--paper))]">
+          <div className="container mx-auto px-6 max-w-5xl">
+            <div className="text-center mb-16">
+              <h2 className="font-display text-display mb-8">
+                What if you
+                <br />
+                <span className="text-red-600">never forgot?</span>
+              </h2>
+              <p className="text-2xl max-w-3xl mx-auto">
+                Set your prompt once. We&apos;ll run it on every new model. 
+                <span className="font-bold"> Forever.</span>
+              </p>
+            </div>
+
+            {/* Prompt Input */}
+            <PromptInput 
+              onSubmit={handlePromptSubmit}
+              isProcessing={isProcessing}
+            />
+
+            {/* Results Display */}
+            {showResults && (
+              <div id="results" className="mt-20">
+                <ResultsDisplay 
+                  prompt={currentPrompt}
+                  onEmailCapture={handleEmailCapture}
+                />
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Social Proof Section */}
+        <section className="py-20 md:py-32 bg-white border-t-4 border-black">
+          <div className="container mx-auto px-6 max-w-6xl">
+            <h2 className="font-display text-display text-center mb-16">
+              Prompts aging like
+              <br />
+              <span className="highlight">fine wine</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our advanced AI models track the evolution of impossible ideas into breakthrough realities
+
+            {/* Trending Prompts Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+              {trendingPrompts.map((prompt) => (
+                <div 
+                  key={prompt.id}
+                  className="border-brutal border-black p-6 bg-white shadow-brutal hover:shadow-brutal-lg transition-all"
+                >
+                  <div className="font-mono text-sm text-gray-600 mb-2">
+                    {prompt.category}
+                  </div>
+                  <p className="font-bold mb-4 line-clamp-2">
+                    &ldquo;{prompt.text}&rdquo;
+                  </p>
+                  <div className="text-3xl font-display font-black text-red-600 mb-2">
+                    {prompt.improvement}
+                  </div>
+                  <div className="font-mono text-xs text-gray-600">
+                    {prompt.submissions.toLocaleString()} submissions
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Live Activity Feed */}
+            <div className="max-w-2xl mx-auto">
+              <h3 className="font-mono text-sm uppercase text-center mb-6">
+                Live Activity Feed
+              </h3>
+              <div className="space-y-3">
+                {recentActivity.map((activity, idx) => (
+                  <div 
+                    key={idx}
+                    className="flex items-center justify-between p-3 bg-gray-50 border-2 border-gray-200"
+                  >
+                    <span className="font-mono text-sm">
+                      Someone {activity.action} a {activity.category} prompt
+                    </span>
+                    <span className="font-mono text-xs text-gray-600">
+                      {activity.time}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="py-20 md:py-32 bg-black text-white">
+          <div className="container mx-auto px-6 max-w-4xl text-center">
+            <h2 className="font-display text-display mb-8">
+              Create your
+              <br />
+              Will Smith moment
+            </h2>
+            <p className="text-2xl mb-12 opacity-90">
+              What prompt will YOU watch evolve?
+            </p>
+            <Button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="
+                px-12 py-6 text-lg font-bold uppercase
+                bg-white text-black border-brutal border-white
+                shadow-brutal hover:shadow-brutal-lg
+                hover:translate-x-[-2px] hover:translate-y-[-2px]
+                transition-all duration-100
+              "
+            >
+              Start Your Benchmark →
+            </Button>
+            <p className="mt-8 font-mono text-sm opacity-70">
+              No sign up. Just enter a prompt and your email. Watch AI grow up.
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="border-0 bg-card/50 hover:bg-card/80 transition-colors duration-200 p-6">
-              <CardHeader className="text-center pb-6 px-0">
-                <div className="w-14 h-14 bg-primary/5 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <CardTitle className="text-xl font-medium">Dream Analysis</CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  AI models analyze your dreams and track their journey from impossible to possible
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="px-0">
-                <p className="text-sm text-muted-foreground text-center">
-                  Multiple AI models assess feasibility, track progress, and identify breakthrough moments
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 bg-card/50 hover:bg-card/80 transition-colors duration-200 p-6">
-              <CardHeader className="text-center pb-6 px-0">
-                <div className="w-14 h-14 bg-primary/5 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                </div>
-                <CardTitle className="text-xl font-medium">Progress Tracking</CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  Watch impossibility scores decrease as technology and understanding advance
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="px-0">
-                <p className="text-sm text-muted-foreground text-center">
-                  Visual timelines show how your dreams evolve from impossible to inevitable
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 bg-card/50 hover:bg-card/80 transition-colors duration-200 p-6">
-              <CardHeader className="text-center pb-6 px-0">
-                <div className="w-14 h-14 bg-primary/5 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <CardTitle className="text-xl font-medium">Community Inspiration</CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  Share dreams publicly and get inspired by others' impossible journeys
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="px-0">
-                <p className="text-sm text-muted-foreground text-center">
-                  Connect with dreamers worldwide and witness collective human ambition unfold
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="py-32">
-          <div className="text-center bg-muted/30 rounded-3xl p-16 border-0">
-            <h2 className="text-3xl md:text-4xl font-medium text-foreground mb-6 tracking-tight">
-              What's Your Impossible Dream?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Every breakthrough started as someone's impossible idea. Share yours and watch AI track its journey to reality.
-            </p>
-            <Link href="/dreams/new">
-              <Button size="lg" className="h-14 px-12 text-base bg-primary hover:bg-primary/90">
-                Submit Your Dream Now
-              </Button>
-            </Link>
-          </div>
-        </div>
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 bg-background">
+      <footer className="border-t-4 border-white bg-black text-white">
         <div className="container mx-auto px-6 py-16">
-          <div className="text-center text-muted-foreground">
-            <p className="text-sm">&copy; 2024 DREAMSHOT.AI. All rights reserved.</p>
+          <div className="text-center">
+            <p className="font-mono text-sm opacity-70">
+              A brutalist experiment in tracking AI progress
+            </p>
+            <p className="font-mono text-xs mt-2 opacity-50">
+              Made with ❤️ by people who never want to forget a prompt again
+            </p>
           </div>
         </div>
       </footer>
+
+      {/* Email Capture Modal */}
+      {showEmailCapture && (
+        <EmailCapture
+          prompt={currentPrompt}
+          onSuccess={handleEmailSuccess}
+          onClose={() => setShowEmailCapture(false)}
+        />
+      )}
     </div>
   );
 }

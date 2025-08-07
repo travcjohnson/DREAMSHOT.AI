@@ -1,74 +1,74 @@
+/* Brutalist Scientific Journal Typography */
+/* All fonts are loaded via next/font in layout.tsx */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Ultra-minimal color palette inspired by Supabase */
-    --background: 0 0% 100%;
-    --foreground: 240 6% 10%;
+    /* Brutalist Color System */
+    --ink: 0 0% 0%;           /* Pure black for text */
+    --paper: 39 23% 99%;      /* Warm off-white like aged paper */
+    --accent: 0 100% 50%;     /* Blood red for emphasis */
+    --graph-blue: 221 100% 50%;  /* Scientific blue for data */
+    --data-gray: 0 0% 60%;    /* Mid gray for secondary data */
+    --highlight: 60 100% 50%; /* Yellow highlighter */
+    
+    /* Base color mappings */
+    --background: var(--paper);
+    --foreground: var(--ink);
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 6% 10%;
+    --card: var(--paper);
+    --card-foreground: var(--ink);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 6% 10%;
+    --popover: var(--paper);
+    --popover-foreground: var(--ink);
 
-    /* Primary: Modern emerald green */
-    --primary: 158 64% 52%;
-    --primary-foreground: 0 0% 100%;
+    --primary: var(--ink);
+    --primary-foreground: var(--paper);
 
-    /* Secondary: Ultra-light gray */
-    --secondary: 240 3% 97%;
-    --secondary-foreground: 240 6% 10%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: var(--ink);
 
-    /* Muted: Softer grays */
-    --muted: 240 3% 97%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 0 0% 96%;
+    --muted-foreground: var(--data-gray);
 
-    /* Accent: Subtle neutral */
-    --accent: 240 3% 97%;
-    --accent-foreground: 240 6% 10%;
+    --accent: var(--accent);
+    --accent-foreground: var(--paper);
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: var(--accent);
+    --destructive-foreground: var(--paper);
 
-    /* Minimal borders */
-    --border: 240 6% 94%;
-    --input: 240 6% 94%;
-    --ring: 158 64% 52%;
+    --border: var(--ink);
+    --input: var(--ink);
+    --ring: var(--ink);
 
-    --radius: 0.5rem;
+    --radius: 0;
+    
+    /* Typography Scale */
+    --font-display: var(--font-playfair), 'Times New Roman', serif;
+    --font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
+    --font-mono: var(--font-jetbrains), 'Courier New', monospace;
+    
+    /* Brutalist Type Scale */
+    --text-9xl: clamp(4rem, 15vw, 12rem);
+    --text-7xl: clamp(3rem, 10vw, 6rem);
+    --text-5xl: clamp(2.5rem, 8vw, 4rem);
+    --text-3xl: clamp(2rem, 5vw, 3rem);
+    --text-xl: 1.25rem;
+    --text-base: 1rem;
+    --text-sm: 0.875rem;
+    --text-footnote: 0.75rem;
+    
+    /* Spacing */
+    --gutter: clamp(2rem, 5vw, 4rem);
+    --margin-scientific: clamp(4rem, 10vw, 8rem);
   }
 
+  /* No dark mode for brutalist design - paper is paper */
   .dark {
-    --background: 240 10% 4%;
-    --foreground: 0 0% 98%;
-
-    --card: 240 8% 5%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 240 8% 5%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 158 64% 52%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 240 4% 8%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 240 4% 8%;
-    --muted-foreground: 240 5% 65%;
-
-    --accent: 240 4% 8%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 4% 12%;
-    --input: 240 4% 12%;
-    --ring: 158 64% 52%;
+    /* Redirects to light mode values */
   }
 }
 
@@ -76,34 +76,181 @@
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    /* Scientific grid paper background */
     background-image: 
-      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
-    background-size: 32px 32px;
-    background-position: 0 0, 0 0;
-    background-attachment: fixed;
+      linear-gradient(90deg, transparent 0%, transparent calc(100% - 1px), hsl(var(--ink) / 0.1) calc(100% - 1px), hsl(var(--ink) / 0.1) 100%),
+      linear-gradient(0deg, transparent 0%, transparent calc(100% - 1px), hsl(var(--ink) / 0.1) calc(100% - 1px), hsl(var(--ink) / 0.1) 100%);
+    background-size: 20px 20px;
+    background-position: -1px -1px;
   }
   
   html {
     scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Brutalist Typography Classes */
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+  
+  .font-mono {
+    font-family: var(--font-mono);
+    font-feature-settings: 'liga' 0;
+  }
+  
+  /* Selection */
+  ::selection {
+    background-color: hsl(var(--highlight));
+    color: hsl(var(--ink));
   }
 }
 
 @layer utilities {
-  .animate-in {
-    @apply animate-slide-up;
+  /* Brutalist Utilities */
+  .border-brutal {
+    border: 3px solid hsl(var(--ink));
   }
   
-  .grid-bg {
+  .border-brutal-thick {
+    border: 5px solid hsl(var(--ink));
+  }
+  
+  .shadow-brutal {
+    box-shadow: 6px 6px 0 0 hsl(var(--ink));
+  }
+  
+  .shadow-brutal-sm {
+    box-shadow: 3px 3px 0 0 hsl(var(--ink));
+  }
+  
+  .shadow-brutal-lg {
+    box-shadow: 10px 10px 0 0 hsl(var(--ink));
+  }
+  
+  .shadow-brutal-red {
+    box-shadow: 6px 6px 0 0 hsl(var(--accent));
+  }
+  
+  /* Text utilities */
+  .text-hero {
+    font-size: var(--text-9xl);
+    line-height: 0.9;
+  }
+  
+  .text-display {
+    font-size: var(--text-7xl);
+    line-height: 0.95;
+  }
+  
+  .text-title {
+    font-size: var(--text-5xl);
+    line-height: 1;
+  }
+  
+  .text-section {
+    font-size: var(--text-3xl);
+    line-height: 1.1;
+  }
+  
+  .text-footnote {
+    font-size: var(--text-footnote);
+    line-height: 1.4;
+  }
+  
+  /* Scientific paper margins */
+  .margin-scientific {
+    margin-left: var(--margin-scientific);
+    margin-right: var(--margin-scientific);
+  }
+  
+  /* Graph paper grid */
+  .grid-scientific {
     background-image: 
-      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
-    background-size: 24px 24px;
+      linear-gradient(90deg, hsl(var(--ink) / 0.3) 1px, transparent 1px),
+      linear-gradient(0deg, hsl(var(--ink) / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--ink) / 0.1) 1px, transparent 1px),
+      linear-gradient(0deg, hsl(var(--ink) / 0.1) 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+    background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
   }
   
-  .glass-effect {
-    @apply bg-background/80 backdrop-blur-md border border-border/50;
+  /* Highlight effect */
+  .highlight {
+    background: linear-gradient(180deg, transparent 40%, hsl(var(--highlight) / 0.4) 40%, hsl(var(--highlight) / 0.4) 90%, transparent 90%);
+    padding: 0 4px;
+    margin: 0 -4px;
+  }
+  
+  /* Footnote styling */
+  .footnote {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+  }
+  
+  .footnote::after {
+    content: attr(data-footnote);
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    font-size: var(--text-footnote);
+    font-family: var(--font-mono);
+    background: hsl(var(--paper));
+    border: 2px solid hsl(var(--ink));
+    padding: 0.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  
+  .footnote:hover::after {
+    opacity: 1;
+  }
+  
+  /* Typewriter effect */
+  @keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+  
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+  
+  .typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 3px solid hsl(var(--ink));
+    animation: 
+      typewriter 2s steps(40, end),
+      blink 0.75s step-end infinite;
+  }
+  
+  /* Graph animations */
+  @keyframes draw-line {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  .animate-draw {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw-line 2s ease-out forwards;
   }
 }
